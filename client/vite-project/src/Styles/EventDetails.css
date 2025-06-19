@@ -1,0 +1,44 @@
+/* EventDetails.css */
+.event-details {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.event-details h2 {
+  color: #004080;
+  margin-bottom: 15px;
+}
+
+.event-details p {
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.register-btn {
+  margin-top: 20px;
+  background-color: #f57c00;
+  color: #fff;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 5px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.register-btn:hover {
+  background-color: #e56b00;
+}
+
+.registered-text {
+  margin-top: 20px;
+  color: green;
+  font-weight: 500;
+}

@@ -1,0 +1,77 @@
+/* Volunteer.css */
+.page {
+  max-width: 1250px;
+  margin: 60px auto;
+  padding: 40px 30px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border-radius: 10px;
+  font-family: 'Segoe UI', sans-serif;
+
+  /* Center contents horizontally and vertically */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.page h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #004080;
+  margin-bottom: 25px;
+  border-bottom: 2px solid #0077cc;
+  padding-bottom: 10px;
+  width: 100%;
+}
+
+form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+form label {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+form input[type="text"],
+form input[type="email"] {
+  margin-top: 6px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 100%;
+  outline-color: #0077cc;
+  transition: border-color 0.2s ease;
+}
+
+form input:focus {
+  border-color: #0077cc;
+}
+
+form button {
+  margin-top: 10px;
+  background-color: #f57c00;
+  color: white;
+  border: none;
+  padding: 10px 30px;
+  font-weight: 500;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background-color: #e56b00;
+}
+

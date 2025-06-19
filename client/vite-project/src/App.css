@@ -1,0 +1,33 @@
+/* App.css or index.css – Global Styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f8f9fa;  /* Slightly brighter than #f6f6f6 */
+  color: #222;                /* Slightly darker for better contrast */
+  line-height: 1.6;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s ease-in-out;
+}
+
+a:hover {
+  color: #0077cc;  /* Adds hover clarity */
+}
+
+button {
+  transition: background-color 0.2s ease, color 0.2s ease;
+  font-family: inherit;
+}
+
+button:hover {
+  opacity: 0.95;
+}
+
+* {
+  box-sizing: border-box; /* Fixes spacing inconsistencies across layout */
+}
+

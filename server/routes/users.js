@@ -33,7 +33,8 @@ router.post('/signup', async (req, res) => {
 
 // POST /api/users/login
 router.post('/login', (req, res) => {
-  const { email, password } = req.body;
+  const { userEmail: email,
+  userPassword: password } = req.body;
 
   db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
     if (err || results.length === 0) {

@@ -9,7 +9,9 @@ const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';
 
 // POST /api/users/signup
 router.post('/signup', async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { userName: name,
+  userEmail: email,
+  userPassword: password, role } = req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);

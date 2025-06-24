@@ -1,34 +1,24 @@
-// src/pages/Events.jsx
 import { useEffect, useState } from 'react';
 import EventCard from '../components/EventCard';
 import '../Styles/Events.css';
 
 function Events() {
   const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // For now, use dummy data; will connect to backend later
-  const fetchEvents = () => {
-    const dummyEvents = [
-      {
-        id: 1,
-        title: 'Juhu Beach Cleanup',
-        beach: 'Juhu Beach',
-        date: '2025-07-01',
-        time: '09:00',
-        capacity: 50,
-        description: 'Join us for a community cleanup at Juhu Beach!'
-      },
-      {
-        id: 2,
-        title: 'Versova Cleanup',
-        beach: 'Versova Beach',
-        date: '2025-07-10',
-        time: '07:30',
-        capacity: 30,
-        description: 'Help us tackle plastic waste at Versova shoreline.'
-      }
-    ];
-    setEvents(dummyEvents);
+  const fetchEvents = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/events');
+      if (!response.ok) throw new Error('Failed to fetch events');
+      const data = await response.json();
+      setEvents(data);
+    } catch (err) {
+      setError('Error loading events. Please try again later.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -38,15 +28,22 @@ function Events() {
   return (
     <div className="page">
       <h2>Upcoming Beach Cleanup Events</h2>
-      <div className="event-list">
-        {events.length > 0 ? (
-          events.map(event => (
-            <EventCard key={event.id} event={event} />
-          ))
-        ) : (
-          <p>No events scheduled yet. Please check back soon!</p>
-        )}
-      </div>
+
+      {loading ? (
+        <p>Loading events...</p>
+      ) : error ? (
+        <p className="error">{error}</p>
+      ) : (
+        <div className="event-list">
+          {events.length > 0 ? (
+            events.map((event) => (
+              <EventCard key={event.event_id} event={event} />
+            ))
+          ) : (
+            <p>No events scheduled yet. Please check back soon!</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

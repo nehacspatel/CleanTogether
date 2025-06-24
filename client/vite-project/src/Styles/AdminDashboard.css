@@ -1,26 +1,76 @@
-/* AdminDashboard.css */
 .admin-dashboard {
-  max-width: 1000px;
-  margin: 40px auto;
-  padding: 30px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  padding: 2rem;
+  font-family: 'Segoe UI', sans-serif;
+  width: 1250px;
+  margin: auto;
 }
 
-.admin-dashboard h2 {
-  font-size: 28px;
-  margin-bottom: 20px;
-  color: #004080;
+h2, h3 {
+  text-align: center;
+  margin-bottom: 1rem;
 }
 
-.admin-dashboard h3 {
-  margin: 30px 0 15px;
-  color: #333;
+.add-event-form {
+  background: #f4f4f4;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.add-event-form input,
+.add-event-form textarea {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.add-event-form button {
+  padding: 0.7rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.add-event-form button:hover {
+  background-color: #0056b3;
 }
 
 .event-list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 1rem;
+}
+
+.event-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 10px;
+  position: relative;
+}
+
+.event-card h4 {
+  margin: 0;
+}
+
+.event-card button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.7rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.event-card button:hover {
+  background-color: #b52a37;
 }

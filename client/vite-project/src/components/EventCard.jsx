@@ -1,29 +1,24 @@
-// src/components/EventCard.jsx
+import React from 'react';
 import '../Styles/EventCard.css';
 
-function EventCard({ event, isAdmin = false }) {
-  const { title, beach, date, time, capacity, description } = event;
+function EventCard({ event }) {
+  const eventDate = new Date(event.date);
+  const formattedDate = eventDate.toLocaleDateString();
+  const formattedTime = eventDate.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 
   return (
     <div className="event-card">
-      <div className="event-header">
-        <h4>{title}</h4>
-        <span className="event-badge">{beach}</span>
-      </div>
-      <p className="event-description">{description}</p>
-      <div className="event-info">
-        <span><strong>Date:</strong> {date}</span>
-        <span><strong>Time:</strong> {time}</span>
-        <span><strong>Volunteers:</strong> {capacity}</span>
-      </div>
-      {isAdmin && (
-        <div className="event-actions">
-          <button className="edit-btn" disabled>Edit</button>
-          <button className="delete-btn" disabled>Delete</button>
-        </div>
-      )}
+      <h3>{event.title}</h3>
+      <p><strong>Location:</strong> {event.location}</p>
+      <p><strong>Date:</strong> {formattedDate}</p>
+      <p><strong>Time:</strong> {formattedTime}</p>
+      <p>{event.description}</p>
     </div>
   );
 }
 
 export default EventCard;
+

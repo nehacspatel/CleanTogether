@@ -3,19 +3,29 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 function Signup() {
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'volunteer' });
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'volunteer'
+  });
+
   const navigate = useNavigate();
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/users/signup', form);
+      await axios.post('http://localhost:5000/api/users/signup', form); // use full backend URL in Vite
       alert('✅ Signup successful! Please log in.');
       navigate('/login');
     } catch (err) {
-      alert('❌ Signup failed. Email might be taken.');
+      const msg = err.response?.data?.message || 'Signup failed.';
+      alert(`❌ ${msg}`);
     }
   };
 
@@ -23,10 +33,31 @@ function Signup() {
     <div className="page">
       <h2>Sign Up</h2>
       <form onSubmit={handleSubmit}>
-        <input name="name" type="text" onChange={handleChange} required placeholder="Full Name" />
-        <input name="email" type="email" onChange={handleChange} required placeholder="Email" />
-        <input name="password" type="password" onChange={handleChange} required placeholder="Password" />
-        <select name="role" onChange={handleChange}>
+        <input
+          name="name"
+          type="text"
+          value={form.name}
+          onChange={handleChange}
+          required
+          placeholder="Full Name"
+        />
+        <input
+          name="email"
+          type="email"
+          value={form.email}
+          onChange={handleChange}
+          required
+          placeholder="Email"
+        />
+        <input
+          name="password"
+          type="password"
+          value={form.password}
+          onChange={handleChange}
+          required
+          placeholder="Password"
+        />
+        <select name="role" value={form.role} onChange={handleChange}>
           <option value="volunteer">Volunteer</option>
           <option value="organizer">Organizer</option>
         </select>
@@ -37,5 +68,3 @@ function Signup() {
 }
 
 export default Signup;
-
-

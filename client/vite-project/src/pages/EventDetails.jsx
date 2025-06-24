@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import './EventDetails.css';
+import '../Styles/EventDetails.css';
 
 function EventDetails() {
   const { id } = useParams();
@@ -8,17 +8,18 @@ function EventDetails() {
   const [registered, setRegistered] = useState(false);
 
   useEffect(() => {
-    // Temporary mock data for development
-    const dummyEvent = {
-      id,
-      title: 'Versova Beach Cleanup',
-      beach: 'Versova Beach',
-      date: '2025-07-10',
-      time: '07:30',
-      capacity: 30,
-      description: 'Help us tackle plastic waste at Versova shoreline.'
+    const fetchEvent = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/events/${id}`);
+        if (!res.ok) throw new Error('Event not found');
+        const data = await res.json();
+        setEvent(data);
+      } catch (error) {
+        console.error('Error fetching event:', error.message);
+      }
     };
-    setEvent(dummyEvent);
+
+    fetchEvent();
   }, [id]);
 
   const handleRegister = () => {
@@ -31,10 +32,9 @@ function EventDetails() {
   return (
     <div className="event-details page">
       <h2>{event.title}</h2>
-      <p><strong>Beach:</strong> {event.beach}</p>
-      <p><strong>Date:</strong> {event.date}</p>
-      <p><strong>Time:</strong> {event.time}</p>
-      <p><strong>Max Volunteers:</strong> {event.capacity}</p>
+      <p><strong>Location:</strong> {event.location}</p>
+      <p><strong>Date:</strong> {new Date(event.date).toLocaleDateString()}</p>
+      <p><strong>Status:</strong> {event.status}</p>
       <p>{event.description}</p>
 
       {!registered ? (

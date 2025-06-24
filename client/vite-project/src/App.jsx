@@ -1,5 +1,6 @@
-// src/App.jsx
+// App.jsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import About from './pages/About.jsx';
@@ -8,32 +9,59 @@ import Volunteer from './pages/Volunteer';
 import Donate from './pages/Donate';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import AdminDashboard from './pages/AdminDashboard'; // ✅ newly added
+import AdminDashboard from './pages/AdminDashboard';
 import NotFound from './pages/NotFound';
 import Footer from './components/Footer';
+import VolunteerDashboard from './pages/VolunteerDashboard';
+import WasteLogger from './pages/WasteLogger';
+
+import { UserContext } from './contexts/UserContext'; // ✅ Add this
+
+// ✅ Toast notifications
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import './App.css';
 
 function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const localUser = JSON.parse(localStorage.getItem('user'));
+    if (localUser) {
+      setUser(localUser);
+    }
+  }, []);
+
   return (
-    <Router>
-      <div className="app-container">
-        <Navbar />
-        <div className="main-content">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/events" element={<Events />} />
-            <Route path="/volunteer" element={<Volunteer />} />
-            <Route path="/donate" element={<Donate />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/admin" element={<AdminDashboard />} /> {/* ✅ New route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+    <UserContext.Provider value={{ user, setUser }}> {/* ✅ wrap entire app */}
+      <Router>
+        <div className="app-container">
+          <Navbar />
+          
+          <div className="main-content">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/volunteer" element={<Volunteer />} />
+              <Route path="/donate" element={<Donate />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+
+              <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} />
+              <Route path="/waste-logger" element={<WasteLogger />} />
+
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
+
+          <ToastContainer position="top-center" autoClose={2000} />
+          <Footer />
         </div>
-        <Footer />
-      </div>
-    </Router>
+      </Router>
+    </UserContext.Provider>
   );
 }
 

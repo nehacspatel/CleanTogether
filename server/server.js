@@ -4,6 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const eventsRouter = require('./routes/events');
 const usersRouter = require('./routes/users');
+const wasteLogsRoute = require("./routes/wasteLogs");
 
 dotenv.config();
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.json());
 
 app.use('/api/events', eventsRouter);
 app.use('/api/users', usersRouter);
+app.use("/api/waste-logs", wasteLogsRoute);
 app.get('/', (req, res) => {
   res.send('CleanTogether API is running');
 });

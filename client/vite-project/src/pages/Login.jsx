@@ -1,59 +1,116 @@
-import { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import axios from "axios";
 
 function Login() {
-  const [form, setForm] = useState({ email: '', password: '' });
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ mode: "onChange" });
+
+  const onSubmit = async (data) => {
+    const userInfo = {
+      userEmail: data.userEmail,
+      userPassword: data.userPassword,
+    };
+
+    try {
+      const res = await axios.post("http://localhost:3000/login/user", userInfo);
+
+      if (res.data) {
+        toast.success("Logged in Successfully");
+        localStorage.setItem("users", JSON.stringify(res.data.user));
+        setTimeout(() => navigate("/UserDashboard"), 1000);
+      }
+    } catch (err) {
+      console.error(err);
+      if (err.response) {
+        switch (err.response.status) {
+          case 400:
+            toast.error("Invalid input. Check your fields.");
+            break;
+          case 401:
+            toast.error("Incorrect email or password.");
+            break;
+          case 500:
+            toast.error("Server error. Try again later.");
+            break;
+          default:
+            toast.error("Unexpected error occurred.");
+        }
+      } else {
+        toast.error("No server response. Check your connection.");
+      }
+    }
   };
 
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const res = await axios.post('http://localhost:5000/api/users/login', form);
-
-    localStorage.setItem('token', res.data.token);
-    localStorage.setItem('user', JSON.stringify(res.data.user));
-    alert('✅ Login successful!');
-
-    const user = res.data.user; // ✅ Define user from response
-
-    if (user.role === 'organizer') {
-      navigate('/admin');
-    } else {
-      navigate('/volunteer-dashboard');
-    }
-
-  } catch (err) {
-    alert('❌ Invalid credentials');
-    console.error(err.response?.data || err.message);
-  }
-};
-
-
   return (
-    <div className="page">
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          name="email"
-          type="email"
-          onChange={handleChange}
-          required
-          placeholder="Email"
-        />
-        <input
-          name="password"
-          type="password"
-          onChange={handleChange}
-          required
-          placeholder="Password"
-        />
-        <button type="submit">Login</button>
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-100 px-4">
+      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
+        <h3 className="text-2xl font-semibold text-center text-indigo-600 mb-6">Login</h3>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          {/* Email */}
+          <div>
+            <label className="text-sm font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              {...register("userEmail", {
+                required: "Email is required",
+                pattern: {
+                  value: /^\S+@\S+$/i,
+                  message: "Invalid email format",
+                },
+              })}
+            />
+            {errors.userEmail && (
+              <p className="text-sm text-red-500 mt-1">{errors.userEmail.message}</p>
+            )}
+          </div>
+
+          {/* Password */}
+          <div>
+            <label className="text-sm font-medium text-gray-700">Password</label>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              {...register("userPassword", {
+                required: "Password is required",
+                minLength: {
+                  value: 6,
+                  message: "Password must be at least 6 characters",
+                },
+              })}
+            />
+            {errors.userPassword && (
+              <p className="text-sm text-red-500 mt-1">{errors.userPassword.message}</p>
+            )}
+          </div>
+
+          {/* Login Button */}
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 text-white py-2 rounded-lg font-medium hover:bg-indigo-700 transition"
+          >
+            Login
+          </button>
+
+          {/* Signup Link */}
+          <p className="text-center text-sm text-gray-500 mt-4">
+            Not registered?{" "}
+            <Link to="/signup" className="text-indigo-600 hover:underline">
+              Signup
+            </Link>
+          </p>
+        </form>
+      </div>
     </div>
   );
 }

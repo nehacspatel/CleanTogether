@@ -13,7 +13,7 @@ function Signup() {
 
   const onSubmit = async (data) => {
     try {
-      await axios.post("http://localhost:5000/api/auth/register", {
+      await axios.post("http://localhost:5000/api/users/signup", {
         userName: data.name,
         userEmail: data.email,
         userPassword: data.password,

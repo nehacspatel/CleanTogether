@@ -1,38 +1,132 @@
+/* Root Container */
 .dashboard-container {
+  max-width: 1200px;
+  margin: 40px auto;
   padding: 2rem;
-  width: 1250px;
-  margin: auto;
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
+/* Headings */
 h2 {
   text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.section {
+  font-size: 32px;
   margin-bottom: 2rem;
+  color: #333;
 }
 
-.event-card, .registered-card {
-  border: 1px solid #ccc;
-  border-radius: 12px;
-  padding: 1rem;
+h3 {
+  font-size: 24px;
   margin-bottom: 1rem;
-  background-color: #f8f9fa;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  color: #444;
 }
 
+/* Section Blocks */
+.section {
+  margin-bottom: 3rem;
+}
+
+/* Event Cards */
+.event-card, .registered-card {
+  background-color: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-left: 6px solid #007bff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.event-card:hover,
+.registered-card:hover {
+  transform: scale(1.01);
+}
+
+/* Event Info */
+.event-card h4,
+.registered-card h4 {
+  margin-bottom: 0.5rem;
+  color: #007bff;
+  font-size: 20px;
+}
+
+.event-card p,
+.registered-card p {
+  margin: 6px 0;
+  color: #444;
+  font-size: 15px;
+}
+
+/* Register Button */
 button {
   background-color: #007bff;
   color: white;
-  padding: 8px 14px;
+  padding: 10px 16px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: 12px;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
   background-color: #0056b3;
+}
+
+/* Registered Label */
+.registered-label {
+  display: inline-block;
+  margin-top: 12px;
+  color: #28a745;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* Filter Dropdown */
+.filter-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2rem;
+  padding: 12px;
+  background-color: #f1f3f5;
+  border-radius: 8px;
+}
+
+.filter-section label {
+  font-weight: 500;
+  color: #333;
+}
+
+.filter-section select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+/* Responsive Adjustments */
+@media screen and (max-width: 768px) {
+  .dashboard-container {
+    padding: 1.5rem;
+    margin: 20px;
+  }
+
+  .filter-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  h2 {
+    font-size: 26px;
+  }
+
+  h3 {
+    font-size: 20px;
+  }
 }

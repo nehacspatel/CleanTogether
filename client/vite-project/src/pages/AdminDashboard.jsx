@@ -101,19 +101,21 @@ const AdminDashboard = () => {
     <div className="admin-dashboard">
       <h2>Admin Dashboard - Manage Events</h2>
 
-      <form className="add-event-form" onSubmit={handleAddEvent}>
-        <h3>Add New Event</h3>
-        <input type="text" name="title" value={formData.title} placeholder="Title" onChange={handleChange} required />
-        <input type="text" name="location" value={formData.location} placeholder="Location" onChange={handleChange} required />
-        <input type="datetime-local" name="date" value={formData.date} onChange={handleChange} required />
-        <textarea name="description" value={formData.description} placeholder="Description" onChange={handleChange} required />
-        <select name="status" value={formData.status} onChange={handleChange}>
-          <option value="upcoming">Upcoming</option>
-          <option value="completed">Completed</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
-        <button type="submit">Add Event</button>
-      </form>
+      <div className="add-event-container">
+        <form className="add-event-form" onSubmit={handleAddEvent}>
+          <h3>Add New Event</h3>
+          <input type="text" name="title" value={formData.title} placeholder="Title" onChange={handleChange} required />
+          <input type="text" name="location" value={formData.location} placeholder="Location" onChange={handleChange} required />
+          <input type="datetime-local" name="date" value={formData.date} onChange={handleChange} required />
+          <textarea name="description" value={formData.description} placeholder="Description" onChange={handleChange} required />
+          <select name="status" value={formData.status} onChange={handleChange}>
+            <option value="upcoming">Upcoming</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <button type="submit">Add Event</button>
+        </form>
+      </div>
 
       <div className="event-list">
         <h3>Existing Events</h3>
@@ -151,7 +153,6 @@ const AdminDashboard = () => {
         )}
       </div>
 
-      {/* Waste Logs Table */}
       <div className="waste-log-section">
         <h3>Waste Logger Submissions</h3>
         {wasteLogs.length === 0 ? (

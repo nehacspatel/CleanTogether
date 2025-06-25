@@ -1,8 +1,7 @@
-// src/pages/WasteLogger.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import "../Styles/WasteLogger.css"; // Optional: your custom CSS
+import "../Styles/WasteLogger.css";
 
 const WasteLogger = () => {
   const [events, setEvents] = useState([]);
@@ -13,7 +12,6 @@ const WasteLogger = () => {
     date: "",
   });
 
-  // Get user from localStorage instead of context
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
 
@@ -42,7 +40,7 @@ const WasteLogger = () => {
 
     const payload = {
       ...formData,
-      user_id: user.user_id, // user_id comes from localStorage
+      user_id: user.user_id,
     };
 
     try {
@@ -61,17 +59,12 @@ const WasteLogger = () => {
   };
 
   return (
-    <div className="waste-logger-container">
+    <div className="waste-logger-wrapper">
       <h2>Log Waste</h2>
       <form onSubmit={handleSubmit} className="waste-logger-form">
         <label>
           Select Event:
-          <select
-            name="event_id"
-            value={formData.event_id}
-            onChange={handleChange}
-            required
-          >
+          <select name="event_id" value={formData.event_id} onChange={handleChange} required>
             <option value="">-- Choose Event --</option>
             {events.map((event) => (
               <option key={event.event_id} value={event.event_id}>
@@ -83,12 +76,7 @@ const WasteLogger = () => {
 
         <label>
           Waste Type:
-          <select
-            name="waste_type"
-            value={formData.waste_type}
-            onChange={handleChange}
-            required
-          >
+          <select name="waste_type" value={formData.waste_type} onChange={handleChange} required>
             <option value="">-- Choose Type --</option>
             <option value="plastic">Plastic</option>
             <option value="glass">Glass</option>

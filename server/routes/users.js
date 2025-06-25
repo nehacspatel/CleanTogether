@@ -9,9 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';
 
 // POST /api/users/signup
 router.post('/signup', async (req, res) => {
-  const { userName: name,
-  userEmail: email,
-  userPassword: password, role } = req.body;
+  const { name, email, password, role } = req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -33,8 +31,7 @@ router.post('/signup', async (req, res) => {
 
 // POST /api/users/login
 router.post('/login', (req, res) => {
-  const { userEmail: email,
-  userPassword: password } = req.body;
+  const { email, password } = req.body;
 
   db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
     if (err || results.length === 0) {

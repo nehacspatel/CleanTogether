@@ -2,14 +2,25 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
-// 1. Get all events
+
+// 1. Get all events with optional status filter
 router.get('/', (req, res) => {
-  const query = 'SELECT * FROM events';
-  db.query(query, (err, results) => {
+  const { status } = req.query;
+
+  let query = 'SELECT * FROM events';
+  const params = [];
+
+  if (status) {
+    query += ' WHERE status = ?';
+    params.push(status);
+  }
+
+  db.query(query, params, (err, results) => {
     if (err) return res.status(500).json({ error: err });
     res.json(results);
   });
 });
+
 
 // 2. Get volunteer count per event (✅ move this above :id)
 router.get('/volunteer-count', (req, res) => {

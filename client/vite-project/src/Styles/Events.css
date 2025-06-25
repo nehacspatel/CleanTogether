@@ -40,3 +40,10 @@
 .page li:hover {
   background-color: #e6f3ff;
 }
+.registered-label {
+  display: inline-block;
+  color: green;
+  font-weight: bold;
+  margin-top: 10px;
+}
+

@@ -14,7 +14,7 @@ import NotFound from './pages/NotFound';
 import Footer from './components/Footer';
 import VolunteerDashboard from './pages/VolunteerDashboard';
 import WasteLogger from './pages/WasteLogger';
-
+import Rewards from './pages/Rewards';
 import { UserContext } from './contexts/UserContext'; // ✅ Add this
 
 // ✅ Toast notifications
@@ -52,7 +52,8 @@ function App() {
 
               <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} />
               <Route path="/waste-logger" element={<WasteLogger />} />
-
+            
+              <Route path="/rewards" element={<Rewards />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>

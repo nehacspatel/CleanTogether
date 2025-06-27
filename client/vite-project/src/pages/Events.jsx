@@ -10,7 +10,6 @@ function Events() {
   const [volunteerCounts, setVolunteerCounts] = useState({});
 
   useEffect(() => {
-    // Fetch user from localStorage
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
       setUser(storedUser);
@@ -70,6 +69,29 @@ function Events() {
     }
   };
 
+  const cancelRegistration = async (eventId) => {
+  const confirmCancel = window.confirm("Are you sure you want to cancel your registration?");
+  if (!confirmCancel) return;
+
+  try {
+    await axios.delete(`http://localhost:5000/api/events/${eventId}/unregister`, {
+      data: { user_id: user.user_id },
+    });
+
+    alert("❌ Registration cancelled");
+    fetchRegisteredEvents(user.user_id);
+    fetchVolunteerCounts();
+  } catch (error) {
+    console.error("❌ Cancellation failed:", {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+      full: error,
+    });
+    alert("❌ Failed to cancel registration");
+  }
+};
+
   return (
     <div className="page">
       <h2>Upcoming Beach Cleanup Events</h2>
@@ -92,16 +114,22 @@ function Events() {
               <p>{event.description}</p>
               <p><strong>Volunteers Registered:</strong> {volunteerCounts[event.event_id] || 0}</p>
 
-              {/* ✅ Show Register button only for volunteers who are NOT registered */}
-              {user?.role === "volunteer" && !isAlreadyRegistered(event.event_id) && (
-                <button onClick={() => registerForEvent(event.event_id)}>
-                  Register
-                </button>
-              )}
-
-              {/* ✅ Show label if already registered */}
-              {user?.role === "volunteer" && isAlreadyRegistered(event.event_id) && (
-                <span className="registered-label">✅ Already Registered</span>
+              {user?.role === "volunteer" && (
+                !isAlreadyRegistered(event.event_id) ? (
+                  <button onClick={() => registerForEvent(event.event_id)}>
+                    Register
+                  </button>
+                ) : (
+                  <>
+                    <span className="registered-label">✅ Already Registered</span>
+                    <button
+                      className="cancel-button"
+                      onClick={() => cancelRegistration(event.event_id)}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                )
               )}
             </div>
           ))

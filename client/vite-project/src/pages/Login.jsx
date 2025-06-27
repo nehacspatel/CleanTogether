@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import { UserContext } from '../contexts/UserContext';
 import "../Styles/Volunteer.css";
 
 function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
+  const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -16,16 +18,15 @@ function Login() {
 
     try {
       const res = await axios.post('http://localhost:5000/api/users/login', form);
+      const user = res.data.user;
 
-      // Store token and user (with role)
+      // ✅ Store user and token immediately
       localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user)); // includes role, id, name, etc.
+      localStorage.setItem('user', JSON.stringify(user));
+      setUser(user);
 
       alert('✅ Login successful!');
 
-      const user = res.data.user;
-
-      // Navigate based on role
       if (user.role === 'organizer') {
         navigate('/admin');
       } else if (user.role === 'volunteer') {

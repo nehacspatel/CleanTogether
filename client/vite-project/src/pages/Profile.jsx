@@ -65,7 +65,7 @@ const Profile = () => {
       const updatedUser = {
         ...user,
         ...formData,
-        profile_image: res.data.profileImage || user.profile_image
+        profile_image: res.data.profile_image || user.profile_image
       };
 
       setUser(updatedUser);
@@ -136,15 +136,26 @@ const Profile = () => {
         {rewards.length === 0 ? (
           <p>No rewards yet</p>
         ) : (
-          <ul>
-            {rewards.map((reward, idx) => (
-              <li key={idx}>
-                <strong>{reward.badge_name}</strong> - {reward.points} pts
-                <br />
-                <small>{new Date(reward.awarded_at).toLocaleString()}</small>
-              </li>
-            ))}
-          </ul>
+          <table className="reward-table">
+            <thead>
+              <tr>
+                <th>Badge</th>
+                <th>Points</th>
+                <th>Event ID</th>
+                <th>Awarded At</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rewards.map((reward, idx) => (
+                <tr key={idx}>
+                  <td>{reward.badge_name}</td>
+                  <td>{reward.points}</td>
+                  <td>{reward.event_id}</td>
+                  <td>{new Date(reward.awarded_at).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
     </div>

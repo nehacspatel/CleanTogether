@@ -44,8 +44,20 @@ const WasteLogger = () => {
     };
 
     try {
+      // Log waste
       await axios.post("http://localhost:5000/api/waste-logs", payload);
-      toast.success("Waste logged successfully!");
+
+      // Issue reward
+      const rewardPayload = {
+        user_id: user.user_id,
+        badge_name: `Waste Logger - ${formData.waste_type}`,
+        points: Math.floor(Number(formData.quantity) * 10), // 10 points per kg
+        event_id: formData.event_id,
+      };
+
+      await axios.post("http://localhost:5000/api/rewards", rewardPayload);
+
+      toast.success("✅ Waste logged and reward granted!");
       setFormData({
         event_id: "",
         waste_type: "",
@@ -53,8 +65,8 @@ const WasteLogger = () => {
         date: "",
       });
     } catch (error) {
-      console.error("Error logging waste:", error);
-      toast.error("Failed to log waste.");
+      console.error("Error logging waste or reward:", error);
+      toast.error("❌ Failed to log waste or reward.");
     }
   };
 

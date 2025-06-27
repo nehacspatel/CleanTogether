@@ -6,6 +6,7 @@ const path = require('path');
 const eventsRouter = require('./routes/events');
 const usersRouter = require('./routes/users');
 const wasteLogsRoute = require("./routes/wasteLogs");
+const rewardsRouter = require('./routes/rewards');
 
 dotenv.config();
 const app = express();
@@ -29,7 +30,10 @@ app.get('/', (req, res) => {
   res.send('CleanTogether API is running');
 });
 
+app.use('/api/rewards', rewardsRouter);
+
 // Start server
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
+

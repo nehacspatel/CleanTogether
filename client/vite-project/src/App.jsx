@@ -1,4 +1,3 @@
-// App.jsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Navbar from './components/Navbar';
@@ -14,8 +13,7 @@ import NotFound from './pages/NotFound';
 import Footer from './components/Footer';
 import VolunteerDashboard from './pages/VolunteerDashboard';
 import WasteLogger from './pages/WasteLogger';
-import Rewards from './pages/Rewards';
-import Profile from './pages/Profile'; // ✅ New import
+import Profile from './pages/Profile';
 import { UserContext } from './contexts/UserContext';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -51,12 +49,11 @@ function App() {
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} />
               <Route path="/waste-logger" element={<WasteLogger />} />
-              <Route path="/rewards" element={<Rewards />} />
-                <Route path="/profile" element={
-                 <ErrorBoundary>
-                   <Profile />
+              <Route path="/profile" element={
+                <ErrorBoundary>
+                  <Profile />
                 </ErrorBoundary>
-                          } />
+              } />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>

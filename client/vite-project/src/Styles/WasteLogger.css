@@ -1,73 +1,69 @@
-/* Wrapper centers everything */
+/* WasteLogger.css */
+
 .waste-logger-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  min-height: 100vh;
-  background-color: #f0f2f5;
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #f4f9f4;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .waste-logger-wrapper h2 {
-  margin-bottom: 1.5rem;
-  color: #333;
+  text-align: center;
+  color: #2d6a4f;
+  margin-bottom: 24px;
+  font-size: 28px;
 }
 
-/* Centered and responsive form */
 .waste-logger-form {
-  width: 100%;
-  max-width: 600px;
-  background: #ffffff;
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .waste-logger-form label {
-  display: block;
-  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
   font-weight: 600;
-  color: #333;
+  color: #1b4332;
 }
 
-.waste-logger-form select,
-.waste-logger-form input {
-  width: 100%;
+.waste-logger-form input,
+.waste-logger-form select {
   padding: 10px;
-  margin-top: 6px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 15px;
-  background-color: #f9f9f9;
+  border: 1px solid #b7e4c7;
+  border-radius: 8px;
+  background-color: #fff;
+  transition: border-color 0.3s ease;
+  font-size: 16px;
+}
+
+.waste-logger-form input:focus,
+.waste-logger-form select:focus {
+  border-color: #40916c;
+  outline: none;
 }
 
 .waste-logger-form button {
-  width: 100%;
-  margin-top: 25px;
   padding: 12px;
-  background-color: #009879;
+  background-color: #40916c;
   color: white;
   border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  font-weight: bold;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 16px;
   transition: background-color 0.3s ease;
 }
 
 .waste-logger-form button:hover {
-  background-color: #007b63;
+  background-color: #2d6a4f;
 }
 
-/* Responsive layout */
-@media screen and (max-width: 700px) {
-  .waste-logger-form {
-    padding: 1.5rem;
-    max-width: 90%;
-  }
-
+@media screen and (max-width: 600px) {
   .waste-logger-wrapper {
-    padding: 1rem;
+    padding: 20px;
+    margin: 20px;
   }
 }

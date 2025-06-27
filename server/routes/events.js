@@ -24,7 +24,7 @@ router.get('/', (req, res) => {
 
 // 2. Get volunteer count per event (✅ move this above :id)
 router.get('/volunteer-count', (req, res) => {
-  console.log('✅ /volunteer-count was called');
+  //console.log('✅ /volunteer-count was called');
   const query = `
     SELECT event_id, COUNT(user_id) as volunteer_count 
     FROM volunteer_event 

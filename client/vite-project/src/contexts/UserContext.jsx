@@ -13,6 +13,13 @@ const UserProvider = ({ children }) => {
     }
   }, []);
 
+  // 🔁 Always keep localStorage in sync when user updates
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    }
+  }, [user]);
+
   return (
     <UserContext.Provider value={{ user, setUser }}>
       {children}

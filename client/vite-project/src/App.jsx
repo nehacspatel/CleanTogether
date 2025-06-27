@@ -15,9 +15,10 @@ import Footer from './components/Footer';
 import VolunteerDashboard from './pages/VolunteerDashboard';
 import WasteLogger from './pages/WasteLogger';
 import Rewards from './pages/Rewards';
-import { UserContext } from './contexts/UserContext'; // ✅ Add this
+import Profile from './pages/Profile'; // ✅ New import
+import { UserContext } from './contexts/UserContext';
+import ErrorBoundary from './components/ErrorBoundary';
 
-// ✅ Toast notifications
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -34,26 +35,28 @@ function App() {
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, setUser }}> {/* ✅ wrap entire app */}
+    <UserContext.Provider value={{ user, setUser }}>
       <Router>
         <div className="app-container">
           <Navbar />
-          
+
           <div className="main-content">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/events" element={<Events />} />
-              <Route path="/volunteer" element={<Volunteer />} />
               <Route path="/donate" element={<Donate />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/admin" element={<AdminDashboard />} />
-
               <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} />
               <Route path="/waste-logger" element={<WasteLogger />} />
-            
               <Route path="/rewards" element={<Rewards />} />
+                <Route path="/profile" element={
+                 <ErrorBoundary>
+                   <Profile />
+                </ErrorBoundary>
+                          } />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>

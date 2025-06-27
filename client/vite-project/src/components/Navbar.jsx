@@ -1,3 +1,4 @@
+// Navbar.jsx
 import { Link, useNavigate } from 'react-router-dom';
 import '../Styles/Navbar.css';
 import { useEffect, useState } from 'react';
@@ -10,7 +11,6 @@ function Navbar() {
   });
 
   useEffect(() => {
-    // Listen for login changes across the app or on refresh
     const handleStorageChange = () => {
       const updatedUser = localStorage.getItem('user');
       setUser(updatedUser ? JSON.parse(updatedUser) : null);
@@ -18,14 +18,13 @@ function Navbar() {
 
     window.addEventListener('storage', handleStorageChange);
 
-    // Also update on route changes in current tab
     const interval = setInterval(() => {
       const updatedUser = localStorage.getItem('user');
       const userObj = updatedUser ? JSON.parse(updatedUser) : null;
       if (JSON.stringify(userObj) !== JSON.stringify(user)) {
         setUser(userObj);
       }
-    }, 500); // Small interval to sync across views
+    }, 500);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
@@ -40,6 +39,10 @@ function Navbar() {
     navigate('/login');
   };
 
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar-logo">
@@ -50,10 +53,12 @@ function Navbar() {
       <ul className="navbar-links">
         <li><Link to="/about">About Us</Link></li>
         <li><Link to="/events">Our Work</Link></li>
-        <li><Link to="/volunteer">Get Involved</Link></li>
+        {user?.role === 'volunteer' && (
+          <li><Link to="/volunteer-dashboard">Dashboard</Link></li>
+        )}
         <li><Link to="/donate">Donate</Link></li>
         {user?.role === 'volunteer' && (
-          <li><Link to="/waste-logger">Go to Waste Logger</Link></li>
+          <li><Link to="/waste-logger">Waste Logger</Link></li>
         )}
       </ul>
 
@@ -65,6 +70,7 @@ function Navbar() {
           </>
         ) : (
           <>
+            <button className="profile-icon" onClick={handleProfileClick}>👤</button>
             <span className="navbar-user">Hi, {user.name || "User"}</span>
             <button onClick={handleLogout} className="logout-btn">Logout</button>
           </>

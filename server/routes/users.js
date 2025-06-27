@@ -3,11 +3,33 @@ const router = express.Router();
 const db = require('../db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
-// Fallback secret if not using .env
+// JWT secret fallback
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';
 
-// POST /api/users/signup
+// Ensure upload directory exists
+const uploadPath = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath);
+}
+
+// Multer storage config
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadPath),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const uniqueName = `profile_${Date.now()}${ext}`;
+    cb(null, uniqueName);
+  }
+});
+const upload = multer({ storage });
+
+/**
+ * POST /signup - Register new user
+ */
 router.post('/signup', async (req, res) => {
   const { name, email, password, role } = req.body;
 
@@ -19,7 +41,6 @@ router.post('/signup', async (req, res) => {
         if (err.code === 'ER_DUP_ENTRY') {
           return res.status(400).json({ message: 'Email already registered.' });
         }
-        console.error(err);
         return res.status(500).json({ message: 'Signup failed.', error: err });
       }
       res.status(201).json({ success: true, user_id: result.insertId });
@@ -29,7 +50,9 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-// POST /api/users/login
+/**
+ * POST /login - Authenticate user
+ */
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -42,11 +65,7 @@ router.post('/login', (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ message: 'Invalid credentials.' });
 
-    const token = jwt.sign(
-      { user_id: user.user_id, role: user.role },
-      JWT_SECRET,
-      { expiresIn: '1d' }
-    );
+    const token = jwt.sign({ user_id: user.user_id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
 
     res.json({
       token,
@@ -55,12 +74,16 @@ router.post('/login', (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        address: user.address || null,
+        profile_image: user.profile_image || null
       },
     });
   });
 });
 
-// GET /api/users/me
+/**
+ * GET /me - Get current user info using Bearer token
+ */
 router.get('/me', (req, res) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ message: 'No token provided.' });
@@ -69,7 +92,7 @@ router.get('/me', (req, res) => {
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     db.query(
-      'SELECT user_id, name, email, role, badges, user_rank FROM users WHERE user_id = ?',
+      'SELECT user_id, name, email, role, address, profile_image FROM users WHERE user_id = ?',
       [decoded.user_id],
       (err, results) => {
         if (err || results.length === 0) {
@@ -81,6 +104,38 @@ router.get('/me', (req, res) => {
   } catch (err) {
     return res.status(403).json({ message: 'Invalid token.' });
   }
+});
+
+/**
+ * PUT /:id - Update user profile (with optional image)
+ */
+router.put('/:id', upload.single('profileImage'), (req, res) => {
+  const userId = req.params.id;
+  const { name, email, address } = req.body;
+  const profileImage = req.file ? `/uploads/${req.file.filename}` : null;
+
+  let query = 'UPDATE users SET name = ?, email = ?, address = ?';
+  const values = [name, email, address];
+
+  if (profileImage) {
+    query += ', profile_image = ?';
+    values.push(profileImage);
+  }
+
+  query += ' WHERE user_id = ?';
+  values.push(userId);
+
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error('Profile update failed:', err);
+      return res.status(500).json({ message: 'Update failed', error: err });
+    }
+
+    res.json({
+      message: 'Profile updated successfully',
+      profile_image: profileImage || null
+    });
+  });
 });
 
 module.exports = router;

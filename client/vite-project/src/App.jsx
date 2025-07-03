@@ -16,6 +16,7 @@ import WasteLogger from './pages/WasteLogger';
 import Profile from './pages/Profile';
 import { UserContext } from './contexts/UserContext';
 import ErrorBoundary from './components/ErrorBoundary';
+import ViewVolunteers from './pages/ViewVolunteers';
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -49,6 +50,8 @@ function App() {
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} />
               <Route path="/waste-logger" element={<WasteLogger />} />
+                  <Route path="/volunteers/:eventId" element={<ViewVolunteers />} />
+
               <Route path="/profile" element={
                 <ErrorBoundary>
                   <Profile />

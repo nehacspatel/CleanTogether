@@ -23,7 +23,10 @@ const Profile = () => {
         setProfilePic(`http://localhost:5000${user.profile_image}`);
       }
 
-      fetchRewards(user.user_id);
+      // Fetch rewards only for volunteers
+      if (user.role === 'volunteer') {
+        fetchRewards(user.user_id);
+      }
     }
   }, [user]);
 
@@ -131,33 +134,36 @@ const Profile = () => {
         </div>
       </div>
 
-      <div className="rewards-section">
-        <h3>Your Rewards</h3>
-        {rewards.length === 0 ? (
-          <p>No rewards yet</p>
-        ) : (
-          <table className="reward-table">
-            <thead>
-              <tr>
-                <th>Badge</th>
-                <th>Points</th>
-                <th>Event ID</th>
-                <th>Awarded At</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rewards.map((reward, idx) => (
-                <tr key={idx}>
-                  <td>{reward.badge_name}</td>
-                  <td>{reward.points}</td>
-                  <td>{reward.event_id}</td>
-                  <td>{new Date(reward.awarded_at).toLocaleString()}</td>
+      {/* Show rewards only for volunteers */}
+      {user.role === 'volunteer' && (
+        <div className="rewards-section">
+          <h3>Your Rewards</h3>
+          {rewards.length === 0 ? (
+            <p>No rewards yet</p>
+          ) : (
+            <table className="reward-table">
+              <thead>
+                <tr>
+                  <th>Badge</th>
+                  <th>Points</th>
+                  <th>Event ID</th>
+                  <th>Awarded At</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+              </thead>
+              <tbody>
+                {rewards.map((reward, idx) => (
+                  <tr key={idx}>
+                    <td>{reward.badge_name}</td>
+                    <td>{reward.points}</td>
+                    <td>{reward.event_id}</td>
+                    <td>{new Date(reward.awarded_at).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
     </div>
   );
 };

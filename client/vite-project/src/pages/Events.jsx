@@ -1,6 +1,6 @@
-// src/pages/Events.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import "../Styles/Events.css";
 
 function Events() {
@@ -11,6 +11,7 @@ function Events() {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
+    console.log("✅ Loaded user from localStorage:", storedUser);
     if (storedUser) {
       setUser(storedUser);
       fetchRegisteredEvents(storedUser.user_id);
@@ -70,31 +71,32 @@ function Events() {
   };
 
   const cancelRegistration = async (eventId) => {
-  const confirmCancel = window.confirm("Are you sure you want to cancel your registration?");
-  if (!confirmCancel) return;
+    const confirmCancel = window.confirm("Are you sure you want to cancel your registration?");
+    if (!confirmCancel) return;
 
-  try {
-    await axios.delete(`http://localhost:5000/api/events/${eventId}/unregister`, {
-      data: { user_id: user.user_id },
-    });
+    try {
+      await axios.delete(`http://localhost:5000/api/events/${eventId}/unregister`, {
+        data: { user_id: user.user_id },
+      });
 
-    alert("❌ Registration cancelled");
-    fetchRegisteredEvents(user.user_id);
-    fetchVolunteerCounts();
-  } catch (error) {
-    console.error("❌ Cancellation failed:", {
-      message: error.message,
-      status: error.response?.status,
-      data: error.response?.data,
-      full: error,
-    });
-    alert("❌ Failed to cancel registration");
-  }
-};
+      alert("❌ Registration cancelled");
+      fetchRegisteredEvents(user.user_id);
+      fetchVolunteerCounts();
+    } catch (error) {
+      console.error("❌ Cancellation failed:", error);
+      alert("❌ Failed to cancel registration");
+    }
+  };
 
   return (
-    <div className="page">
+    <div className="pages">
       <h2>Upcoming Beach Cleanup Events</h2>
+
+      {user && (
+        <p style={{ fontStyle: "italic", color: "gray", marginBottom: "10px" }}>
+          Logged in as: <strong>{user.name}</strong> ({user.role})
+        </p>
+      )}
 
       <div className="event-list">
         {events.length === 0 ? (
@@ -112,7 +114,20 @@ function Events() {
               </p>
               <p><strong>Location:</strong> {event.location}</p>
               <p>{event.description}</p>
-              <p><strong>Volunteers Registered:</strong> {volunteerCounts[event.event_id] || 0}</p>
+
+              <p>
+                <strong>Volunteers Registered:</strong>{" "}
+               {["admin", "organizer"].includes(user?.role?.toLowerCase()) ? (
+                  <Link
+                    to={`/volunteers/${event.event_id}`}
+                    className="view-volunteers-link"
+                  >
+                    {volunteerCounts[event.event_id] || 0}
+                  </Link>
+                ) : (
+                  volunteerCounts[event.event_id] || 0
+                )}
+              </p>
 
               {user?.role === "volunteer" && (
                 !isAlreadyRegistered(event.event_id) ? (

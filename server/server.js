@@ -32,6 +32,9 @@ app.get('/', (req, res) => {
 
 app.use('/api/rewards', rewardsRouter);
 
+const chatbotRouter = require('./routes/chatbot');
+app.use('/api/chatbot', chatbotRouter);
+
 // Start server
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);

@@ -20,7 +20,6 @@ router.get('/:userId', (req, res) => {
 // ✅ POST /api/rewards - create a new reward
 router.post('/', (req, res) => {
   const { user_id, badge_name, points, event_id } = req.body;
-  console.log("🎯 Incoming reward data:", req.body); // <--- Add this
 
   if (!user_id || !badge_name || !points || !event_id) {
     return res.status(400).json({ message: "Missing required fields" });

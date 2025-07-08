@@ -11,20 +11,26 @@ function Events() {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    console.log("✅ Loaded user from localStorage:", storedUser);
     if (storedUser) {
       setUser(storedUser);
       fetchRegisteredEvents(storedUser.user_id);
     }
 
-    fetchEvents();
+    fetchEvents(storedUser);
     fetchVolunteerCounts();
   }, []);
 
-  const fetchEvents = async () => {
+  const fetchEvents = async (storedUser) => {
     try {
       const response = await axios.get("http://localhost:5000/api/events?status=upcoming");
-      setEvents(response.data || []);
+      let allEvents = response.data || [];
+
+      // ✅ Filter for admins/organizers
+      if (storedUser?.role === "admin" || storedUser?.role === "organizer") {
+        allEvents = allEvents.filter(ev => ev.organizer_id === storedUser.user_id);
+      }
+
+      setEvents(allEvents);
     } catch (error) {
       console.error("Error fetching events", error);
     }
@@ -115,9 +121,14 @@ function Events() {
               <p><strong>Location:</strong> {event.location}</p>
               <p>{event.description}</p>
 
+              {/* ✅ Show organizer's name only to volunteers */}
+              {user?.role === "volunteer" && (
+                <p><strong>Organizer:</strong> {event.organizer_name || "N/A"}</p>
+              )}
+
               <p>
                 <strong>Volunteers Registered:</strong>{" "}
-               {["admin", "organizer"].includes(user?.role?.toLowerCase()) ? (
+                {["admin", "organizer"].includes(user?.role?.toLowerCase()) ? (
                   <Link
                     to={`/volunteers/${event.event_id}`}
                     className="view-volunteers-link"
@@ -129,6 +140,7 @@ function Events() {
                 )}
               </p>
 
+              {/* ✅ Volunteer Actions */}
               {user?.role === "volunteer" && (
                 !isAlreadyRegistered(event.event_id) ? (
                   <button onClick={() => registerForEvent(event.event_id)}>

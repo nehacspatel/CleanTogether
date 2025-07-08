@@ -1,41 +1,62 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import '../Styles/AdminDashboard.css';
 
 const AdminDashboard = () => {
   const [events, setEvents] = useState([]);
   const [volunteerCounts, setVolunteerCounts] = useState({});
   const [wasteLogs, setWasteLogs] = useState([]);
+  const [filteredLogs, setFilteredLogs] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const organizer_id = parseInt(localStorage.getItem("user_id"));
+
   const [formData, setFormData] = useState({
     title: '',
     location: '',
     date: '',
     description: '',
     status: 'upcoming',
-    organizer_id: 1,
+    organizer_id: organizer_id,
   });
 
   useEffect(() => {
-    fetchEvents();
-    fetchVolunteerCounts();
-    fetchWasteLogs();
+    const fetchAllData = async () => {
+      const myEvents = await fetchEvents();
+      await fetchVolunteerCounts(myEvents);
+      await fetchWasteLogs(myEvents);
+    };
+    fetchAllData();
   }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [wasteLogs, selectedStatus, searchQuery]);
 
   const fetchEvents = async () => {
     try {
       const res = await axios.get('http://localhost:5000/api/events');
-      setEvents(res.data);
+      const myEvents = res.data.filter(event => event.organizer_id === organizer_id);
+      setEvents(myEvents);
+      return myEvents;
     } catch (err) {
       console.error('Failed to fetch events', err);
+      return [];
     }
   };
 
-  const fetchVolunteerCounts = async () => {
+  const fetchVolunteerCounts = async (myEvents) => {
     try {
       const res = await axios.get('http://localhost:5000/api/events/volunteer-count');
+      const eventIds = myEvents.map(ev => ev.event_id);
       const countMap = {};
       res.data.forEach(ev => {
-        countMap[ev.event_id] = ev.volunteer_count;
+        if (eventIds.includes(ev.event_id)) {
+          countMap[ev.event_id] = ev.volunteer_count;
+        }
       });
       setVolunteerCounts(countMap);
     } catch (err) {
@@ -43,12 +64,14 @@ const AdminDashboard = () => {
     }
   };
 
-  const fetchWasteLogs = async () => {
+  const fetchWasteLogs = async (myEvents) => {
     try {
       const res = await axios.get('http://localhost:5000/api/waste-logs');
-      setWasteLogs(res.data);
+      const myEventIds = myEvents.map(ev => ev.event_id);
+      const logs = res.data.filter(log => myEventIds.includes(log.event_id));
+      setWasteLogs(logs);
     } catch (err) {
-      console.error('Failed to fetch waste logs', err);
+      console.error("Failed to fetch waste logs", err);
     }
   };
 
@@ -58,8 +81,9 @@ const AdminDashboard = () => {
 
     try {
       await axios.delete(`http://localhost:5000/api/events/${eventId}`);
-      fetchEvents();
-      fetchVolunteerCounts();
+      const updatedEvents = await fetchEvents();
+      await fetchVolunteerCounts(updatedEvents);
+      await fetchWasteLogs(updatedEvents);
     } catch (err) {
       console.error('Failed to delete event', err);
     }
@@ -67,10 +91,14 @@ const AdminDashboard = () => {
 
   const handleStatusChange = async (eventId, newStatus) => {
     try {
-      await axios.put(`http://localhost:5000/api/events/${eventId}/status`, { status: newStatus });
-      fetchEvents();
+      await axios.put(`http://localhost:5000/api/events/${eventId}/status`, {
+        status: newStatus,
+        organizer_id: organizer_id,
+      });
+      const updatedEvents = await fetchEvents();
+      await fetchWasteLogs(updatedEvents);
     } catch (err) {
-      console.error('Failed to update status', err);
+      console.error("❌ Failed to update status", err);
     }
   };
 
@@ -80,6 +108,14 @@ const AdminDashboard = () => {
 
   const handleAddEvent = async (e) => {
     e.preventDefault();
+    const selectedDate = new Date(formData.date);
+    const now = new Date();
+
+    if (selectedDate <= now) {
+      alert('❌ Please select a future date and time for the event.');
+      return;
+    }
+
     try {
       await axios.post('http://localhost:5000/api/events', formData);
       setFormData({
@@ -88,75 +124,104 @@ const AdminDashboard = () => {
         date: '',
         description: '',
         status: 'upcoming',
-        organizer_id: 1,
+        organizer_id: organizer_id,
       });
-      fetchEvents();
-      fetchVolunteerCounts();
+      const updatedEvents = await fetchEvents();
+      await fetchVolunteerCounts(updatedEvents);
+      await fetchWasteLogs(updatedEvents);
     } catch (err) {
       console.error('Failed to add event', err);
     }
   };
 
+  const applyFilters = () => {
+    let logs = [...wasteLogs];
+    if (selectedStatus !== 'all') {
+      logs = logs.filter(log => log.status === selectedStatus);
+    }
+    if (searchQuery) {
+      logs = logs.filter(log =>
+        log.user_id.toString().includes(searchQuery) ||
+        (events.find(e => e.event_id === log.event_id)?.title.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
+    }
+    setFilteredLogs(logs);
+  };
+
   return (
     <div className="admin-dashboard">
-      <h2>Admin Dashboard - Manage Events</h2>
-
-      <div className="add-event-container">
-        <form className="add-event-form" onSubmit={handleAddEvent}>
-          <h3>Add New Event</h3>
-          <input type="text" name="title" value={formData.title} placeholder="Title" onChange={handleChange} required />
-          <input type="text" name="location" value={formData.location} placeholder="Location" onChange={handleChange} required />
-          <input type="datetime-local" name="date" value={formData.date} onChange={handleChange} required />
-          <textarea name="description" value={formData.description} placeholder="Description" onChange={handleChange} required />
-          <select name="status" value={formData.status} onChange={handleChange}>
-            <option value="upcoming">Upcoming</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-          <button type="submit">Add Event</button>
-        </form>
-      </div>
+      <h2>Admin Dashboard - My Organized Events</h2>
 
       <div className="event-list">
-        <h3>Existing Events</h3>
+        <h3>Create New Event</h3>
+        <div className="add-event-container">
+          <form className="add-event-form" onSubmit={handleAddEvent}>
+            <input type="text" name="title" value={formData.title} placeholder="Event Title" onChange={handleChange} required />
+            <input type="text" name="location" value={formData.location} placeholder="Location" onChange={handleChange} required />
+            <input type="datetime-local" name="date" value={formData.date} min={new Date().toISOString().slice(0, 16)} onChange={handleChange} required />
+            <textarea name="description" value={formData.description} placeholder="Description" onChange={handleChange} required />
+            <select name="status" value={formData.status} onChange={handleChange}>
+              <option value="upcoming">Upcoming</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <button type="submit">Add Event</button>
+          </form>
+        </div>
+
+        <h3>My Events</h3>
         {events.length === 0 ? (
-          <p>No events available.</p>
+          <p>No events organized by you.</p>
         ) : (
           events.map(event => (
             <div key={event.event_id} className="event-card">
               <h4>{event.title}</h4>
               <p><strong>Location:</strong> {event.location}</p>
-              <p>
-                <strong>Date & Time:</strong>{' '}
-                {new Date(event.date).toLocaleString(undefined, {
-                  dateStyle: 'medium',
-                  timeStyle: 'short',
-                })}
-              </p>
-              <p><strong>Status:</strong> {event.status}</p>
-
-              <select
-                value={event.status}
-                onChange={(e) => handleStatusChange(event.event_id, e.target.value)}
-              >
+              <p><strong>Date:</strong> {new Date(event.date).toLocaleString()}</p>
+              <p><strong>Status:</strong></p>
+              <select value={event.status} onChange={(e) => handleStatusChange(event.event_id, e.target.value)}>
                 <option value="upcoming">Upcoming</option>
                 <option value="completed">Completed</option>
                 <option value="cancelled">Cancelled</option>
               </select>
-
               <p>{event.description}</p>
               <p><strong>Volunteers Registered:</strong> {volunteerCounts[event.event_id] || 0}</p>
 
-              <button onClick={() => handleDelete(event.event_id)}>Delete</button>
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                <Link to={`/volunteers/${event.event_id}`} className="btn btn-primary">View Volunteers</Link>
+                <Link to={`/events/${event.event_id}/attendance`} className="btn btn-secondary">Manage Attendance</Link>
+                {event.status === 'completed' && (
+                  <Link to={`/admin/feedback/${event.event_id}`} className="btn btn-feedback">View Feedback</Link>
+                )}
+              </div>
+
+              {event.status === "upcoming" && (
+                <button onClick={() => handleDelete(event.event_id)} style={{ marginTop: '0.5rem' }}>Delete</button>
+              )}
             </div>
           ))
         )}
       </div>
 
+      <div className="log-filters">
+        <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
+          <option value="all">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+        <input
+          type="text"
+          placeholder="Search by Volunteer ID or Event Title"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
       <div className="waste-log-section">
-        <h3>Waste Logger Submissions</h3>
-        {wasteLogs.length === 0 ? (
-          <p>No waste submissions yet.</p>
+        <h3>Waste Logs (Your Events Only)</h3>
+        {filteredLogs.length === 0 ? (
+          <p>No matching waste submissions.</p>
         ) : (
           <table className="waste-log-table">
             <thead>
@@ -166,16 +231,18 @@ const AdminDashboard = () => {
                 <th>Waste Type</th>
                 <th>Quantity (kg)</th>
                 <th>Submitted At</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              {wasteLogs.map((log, index) => (
-                <tr key={index}>
+              {filteredLogs.map((log, i) => (
+                <tr key={i}>
                   <td>{log.user_id}</td>
                   <td>{log.event_id}</td>
                   <td>{log.waste_type}</td>
                   <td>{log.quantity}</td>
-                  <td>{new Date(log.timestamp).toLocaleString()}</td>
+                  <td>{new Date(log.timestamp || log.logged_at).toLocaleString()}</td>
+                  <td>{log.status}</td>
                 </tr>
               ))}
             </tbody>

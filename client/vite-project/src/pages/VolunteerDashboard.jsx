@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import FeedbackForm from "../pages/FeedbackForm";
 import "../Styles/Dashboard.css";
 
 const VolunteerDashboard = () => {
@@ -8,6 +10,9 @@ const VolunteerDashboard = () => {
   const [userId, setUserId] = useState(null);
   const [statusFilter, setStatusFilter] = useState("");
   const [volunteerCounts, setVolunteerCounts] = useState({});
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -55,13 +60,26 @@ const VolunteerDashboard = () => {
     return registeredEvents.some((event) => event.event_id === eventId);
   };
 
+  const canGiveFeedback = (eventId) => {
+    const event = registeredEvents.find((e) => e.event_id === eventId);
+    return event && event.status === "completed" && event.attendance_status === "present";
+  };
+
+  const openFeedbackForm = (eventId) => {
+    setSelectedEventId(eventId);
+    setShowFeedbackForm(true);
+  };
+
   const filteredEvents = statusFilter
     ? events.filter((e) => e.status === statusFilter)
     : events;
 
   const formatDateTime = (datetime) => {
     const dateObj = new Date(datetime);
-    return `${dateObj.toLocaleDateString()} at ${dateObj.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+    return `${dateObj.toLocaleDateString()} at ${dateObj.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}`;
   };
 
   return (
@@ -96,14 +114,37 @@ const VolunteerDashboard = () => {
                 <p>{event.description}</p>
                 <p><strong>Status:</strong> {event.status}</p>
                 <p><strong>Volunteers Registered:</strong> {volunteerCounts[event.event_id] || 0}</p>
+
                 {isAlreadyRegistered(event.event_id) && (
-                  <span className="registered-label">✅ Already Registered</span>
+                  <>
+                    <span className="registered-label">✅ Already Registered</span>
+
+                    {canGiveFeedback(event.event_id) ? (
+                      <button
+                        onClick={() => openFeedbackForm(event.event_id)}
+                        className="feedback-button"
+                      >
+                        Give Feedback
+                      </button>
+                    ) : (
+                      <p className="info-text">
+                        Feedback will be available after attending the completed event.
+                      </p>
+                    )}
+                  </>
                 )}
               </li>
             ))}
           </ul>
         )}
       </div>
+
+      {showFeedbackForm && (
+        <FeedbackForm
+          eventId={selectedEventId}
+          onClose={() => setShowFeedbackForm(false)}
+        />
+      )}
     </div>
   );
 };

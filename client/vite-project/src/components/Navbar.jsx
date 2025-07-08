@@ -60,6 +60,18 @@ function Navbar() {
         {user?.role === 'volunteer' && (
           <li><Link to="/waste-logger">Waste Logger</Link></li>
         )}
+        
+        {user?.role === 'organizer' && (
+          <li><Link to="/admin">Add Event</Link></li>
+        )}
+        {user?.role === 'organizer' && (
+ <Link to="/admin/waste-details">Waste Details</Link>
+        )}
+        <li>
+          <Link to="/admin/image-approval" className="approval-link">
+            Waste Approval
+          </Link>
+        </li>
       </ul>
 
       <div className="navbar-buttons">
@@ -80,4 +92,4 @@ function Navbar() {
   );
 }
 
-export default Navbar;
+export default Navbar

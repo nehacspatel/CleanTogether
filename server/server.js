@@ -35,6 +35,10 @@ app.use('/api/rewards', rewardsRouter);
 const chatbotRouter = require('./routes/chatbot');
 app.use('/api/chatbot', chatbotRouter);
 
+const feedbackRoutes = require("./routes/feedbacks"); // ✅ MATCHES FILENAME
+app.use("/api/feedback", feedbackRoutes);
+
+
 // Start server
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);

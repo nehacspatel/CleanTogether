@@ -11,127 +11,165 @@ const WasteLogger = () => {
     quantity: "",
     date: "",
   });
+  const [proofImage, setProofImage] = useState(null);
 
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
 
   useEffect(() => {
+    if (!user?.user_id) return;
+
     axios
-      .get("http://localhost:5000/api/events")
+      .get(`http://localhost:5000/api/events/registered/${user.user_id}`)
       .then((response) => {
-        setEvents(response.data);
+        setEvents(response.data || []);
       })
       .catch((error) => {
-        console.error("Error fetching events:", error);
-        toast.error("Failed to load events");
+        console.error("Error fetching eligible events:", error);
+        toast.error("Failed to load your eligible events");
       });
-  }, []);
+  }, [user?.user_id]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handleFileChange = (e) => {
+    setProofImage(e.target.files[0]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!user?.user_id) {
       toast.error("You must be logged in to log waste.");
       return;
     }
 
-    const payload = {
-      ...formData,
-      user_id: user.user_id,
-    };
+    const selectedEvent = events.find(
+      (e) => e.event_id === parseInt(formData.event_id)
+    );
 
-    try {
-      console.log("➡ Logging waste with:", payload);
-      await axios.post("http://localhost:5000/api/waste-logs", payload);
-      console.log("✅ Waste log successful");
-    } catch (err) {
-      console.error("❌ Error logging waste:", err);
-      toast.error("Failed to log waste.");
-      return; // Don't proceed if waste logging fails
+    if (!selectedEvent) {
+      toast.error("❌ Invalid or unauthorized event selected.");
+      return;
     }
 
+    const form = new FormData();
+    form.append("user_id", user.user_id);
+    form.append("event_id", formData.event_id);
+    form.append("waste_type", formData.waste_type);
+    form.append("quantity", formData.quantity);
+    form.append("date", formData.date);
+    if (proofImage) form.append("proof_image", proofImage);
+
     try {
-      const rewardPayload = {
-        user_id: user.user_id,
-        badge_name: `Waste Logger - ${formData.waste_type}`,
-        points: Math.floor(Number(formData.quantity) * 10), // 10 points per kg
-        event_id: formData.event_id,
-      };
+      await axios.post("http://localhost:5000/api/waste-logs", form, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-      console.log("➡ Issuing reward with:", rewardPayload);
-      await axios.post("http://localhost:5000/api/rewards", rewardPayload);
-      console.log("✅ Reward granted");
+      toast.success("✅ Waste logged successfully! Waiting for admin approval.");
 
-      toast.success("✅ Waste logged and reward granted!");
+      // Reset form
       setFormData({
         event_id: "",
         waste_type: "",
         quantity: "",
         date: "",
       });
+      setProofImage(null);
     } catch (err) {
-      console.error("❌ Error issuing reward:", err);
-      toast.error("Waste logged, but reward failed.");
+      console.error("❌ Error logging waste:", err);
+      toast.error("Failed to log waste.");
     }
   };
 
   return (
     <div className="waste-logger-wrapper">
       <h2>Log Waste</h2>
-      <form onSubmit={handleSubmit} className="waste-logger-form">
-        <label>
-          Select Event:
-          <select name="event_id" value={formData.event_id} onChange={handleChange} required>
-            <option value="">-- Choose Event --</option>
-            {events.map((event) => (
-              <option key={event.event_id} value={event.event_id}>
-                {event.title}
-              </option>
-            ))}
-          </select>
-        </label>
 
-        <label>
-          Waste Type:
-          <select name="waste_type" value={formData.waste_type} onChange={handleChange} required>
-            <option value="">-- Choose Type --</option>
-            <option value="plastic">Plastic</option>
-            <option value="glass">Glass</option>
-            <option value="metal">Metal</option>
-            <option value="organic">Organic</option>
-            <option value="e-waste">E-Waste</option>
-          </select>
-        </label>
+      {events.length === 0 ? (
+        <p>
+          No eligible events found. You can only log waste if you attended a completed event.
+        </p>
+      ) : (
+        <form
+          onSubmit={handleSubmit}
+          className="waste-logger-form"
+          encType="multipart/form-data"
+        >
+          <label>
+            Select Event:
+            <select
+              name="event_id"
+              value={formData.event_id}
+              onChange={handleChange}
+              required
+            >
+              <option value="">-- Choose Event --</option>
+              {events.map((event) => (
+                <option key={event.event_id} value={event.event_id}>
+                  {event.title}
+                </option>
+              ))}
+            </select>
+          </label>
 
-        <label>
-          Waste Quantity (kg):
-          <input
-            type="number"
-            name="quantity"
-            value={formData.quantity}
-            onChange={handleChange}
-            required
-            min="0"
-            step="0.01"
-          />
-        </label>
+          <label>
+            Waste Type:
+            <select
+              name="waste_type"
+              value={formData.waste_type}
+              onChange={handleChange}
+              required
+            >
+              <option value="">-- Choose Type --</option>
+              <option value="plastic">Plastic</option>
+              <option value="glass">Glass</option>
+              <option value="metal">Metal</option>
+              <option value="organic">Organic</option>
+              <option value="e-waste">E-Waste</option>
+            </select>
+          </label>
 
-        <label>
-          Date:
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            required
-          />
-        </label>
+          <label>
+            Waste Quantity (kg):
+            <input
+              type="number"
+              name="quantity"
+              value={formData.quantity}
+              onChange={handleChange}
+              required
+              min="0.01"
+              step="0.01"
+            />
+          </label>
 
-        <button type="submit">Submit</button>
-      </form>
+          <label>
+            Date:
+            <input
+              type="date"
+              name="date"
+              value={formData.date}
+              onChange={handleChange}
+              required
+            />
+          </label>
+
+          <label>
+            Upload Proof Image:
+            <input
+              type="file"
+              name="proof_image"
+              accept="image/*"
+              onChange={handleFileChange}
+              required
+            />
+          </label>
+
+          <button type="submit">Submit</button>
+        </form>
+      )}
     </div>
   );
 };

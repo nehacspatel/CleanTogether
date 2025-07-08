@@ -20,25 +20,35 @@ function Login() {
       const res = await axios.post('http://localhost:5000/api/users/login', form);
       const user = res.data.user;
 
-      // ✅ Store user and token immediately
+      if (!user || !user.user_id || !user.role) {
+        alert("⚠️ Incomplete user data received from server");
+        return;
+      }
+
+      // ✅ Store data in localStorage
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('user_id', user.user_id.toString());
+      localStorage.setItem('role', user.role);
+
       setUser(user);
 
+      console.log("✅ Logged in user:", user);
       alert('✅ Login successful!');
 
+      // Redirect based on role
       if (user.role === 'organizer') {
         navigate('/admin');
       } else if (user.role === 'volunteer') {
         navigate('/volunteer-dashboard');
       } else {
-        alert('⚠️ Unknown user role. Redirecting to home.');
+        alert('⚠️ Unknown role, redirecting to home');
         navigate('/');
       }
 
     } catch (err) {
-      alert('❌ Invalid credentials');
-      console.error(err.response?.data || err.message);
+      console.error("❌ Login failed:", err.response?.data || err.message);
+      alert('❌ Invalid credentials. Please try again.');
     }
   };
 

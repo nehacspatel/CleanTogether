@@ -1,0 +1,27 @@
+.image-approval-page {
+  padding: 20px;
+}
+.approval-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.approval-table th,
+.approval-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content img {
+  max-width: 90%;
+  max-height: 90vh;
+}

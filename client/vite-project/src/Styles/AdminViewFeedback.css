@@ -1,0 +1,51 @@
+/* AdminFeedbackView.css */
+
+.admin-feedback-view {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.admin-feedback-view h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+  color: #2c3e50;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+.feedback-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.feedback-card {
+  padding: 1rem 1.5rem;
+  border-left: 4px solid #3498db;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+
+.feedback-card:hover {
+  transform: translateY(-2px);
+}
+
+.feedback-card p {
+  margin: 0.4rem 0;
+  font-size: 0.95rem;
+}
+
+.feedback-card p strong {
+  color: #34495e;
+}
+
+.feedback-card em {
+  color: #7f8c8d;
+  font-size: 0.85rem;
+}

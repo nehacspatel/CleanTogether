@@ -1,7 +1,7 @@
 .admin-dashboard {
   padding: 2rem;
   font-family: 'Segoe UI', sans-serif;
-  max-width: 900px;
+  max-width: 1000px;
   margin: auto;
 }
 
@@ -14,7 +14,14 @@ h2, h3 {
 .add-event-container {
   display: flex;
   justify-content: center;
+  align-items: center; /* Optional if you want vertical centering too */
   margin-bottom: 2rem;
+}
+
+/* Optional: restrict the form width and center it */
+.add-event-form {
+  width: 100%;
+  max-width: 600px;
 }
 
 /* Styling the form */

@@ -17,12 +17,15 @@ import VolunteerDashboard from './pages/VolunteerDashboard';
 import WasteLogger from './pages/WasteLogger';
 import Profile from './pages/Profile';
 import ViewVolunteers from './pages/ViewVolunteers';
+import ManageAttendance from './pages/ManageAttendance';
+import ImageApproval from "./pages/ImageApproval";
 
+import VolunteerWasteDetails from "./pages/VolunteerWasteDetails";
 import Chatbot from './components/Chatbot'; // ✅ Chatbot widget
-
+import FeedbackForm from './pages/FeedbackForm.jsx';
 import { UserContext } from './contexts/UserContext';
 import ErrorBoundary from './components/ErrorBoundary';
-
+import AdminFeedbackView from './pages/AdminFeedbackView.jsx';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -54,9 +57,14 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} />
+                <Route path="/admin/waste-details" element={<VolunteerWasteDetails />} />
               <Route path="/waste-logger" element={<WasteLogger />} />
               <Route path="/volunteers/:eventId" element={<ViewVolunteers />} />
               {/* ❌ Removed route path="/chat" — no longer needed */}
+              <Route path="/admin/image-approval" element={<ImageApproval />} />
+              <Route path="/events/:eventId/attendance" element={<ManageAttendance />} />
+              <Route path="/feedback/:eventId" element={<FeedbackForm />} />
+            <Route path="/admin/feedback/:eventId" element={<AdminFeedbackView />} />
 
               <Route path="/profile" element={
                 <ErrorBoundary>

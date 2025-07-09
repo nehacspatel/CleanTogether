@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify";
+import { io } from "socket.io-client";
+
 import FeedbackForm from "../pages/FeedbackForm";
 import "../Styles/Dashboard.css";
+
+const socket = io("http://localhost:5000"); // Socket initialized once
 
 const VolunteerDashboard = () => {
   const [events, setEvents] = useState([]);
@@ -16,13 +21,27 @@ const VolunteerDashboard = () => {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
+
+    fetchEvents();
+    fetchVolunteerCounts();
+
+    if (storedUser && storedUser.role === "volunteer") {
       const id = storedUser.user_id || storedUser.id;
       setUserId(id);
       fetchRegisteredEvents(id);
+
+      // Register socket for volunteer
+      socket.emit("register", id);
+
+      socket.on("notification", (data) => {
+        toast.info(`${data.title}: ${data.message}`);
+      });
+
+      return () => {
+        socket.off("notification");
+        socket.disconnect();
+      };
     }
-    fetchEvents();
-    fetchVolunteerCounts();
   }, []);
 
   const fetchEvents = async () => {
@@ -75,6 +94,7 @@ const VolunteerDashboard = () => {
     : events;
 
   const formatDateTime = (datetime) => {
+    if (!datetime) return "N/A";
     const dateObj = new Date(datetime);
     return `${dateObj.toLocaleDateString()} at ${dateObj.toLocaleTimeString([], {
       hour: "2-digit",

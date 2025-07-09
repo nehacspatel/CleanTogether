@@ -20,7 +20,7 @@ const WasteLogger = () => {
     if (!user?.user_id) return;
 
     axios
-      .get(`http://localhost:5000/api/events/registered/${user.user_id}`)
+      .get(`http://localhost:5000/api/events/registered/${user.user_id}?type=waste`)
       .then((response) => {
         setEvents(response.data || []);
       })

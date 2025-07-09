@@ -46,18 +46,21 @@ router.post("/", (req, res) => {
   });
 });
 
-// 3. Get completed + present events a user attended (used by WasteLogger/Feedback)
-// ✅ Route: /api/events/registered/:userId
 router.get("/registered/:userId", (req, res) => {
   const { userId } = req.params;
+  const { type } = req.query;
 
-  const query = `
+  let query = `
     SELECT e.*, a.status AS attendance_status
     FROM events e
     JOIN volunteer_event ve ON e.event_id = ve.event_id
     LEFT JOIN attendance a ON ve.event_id = a.event_id AND ve.user_id = a.user_id
     WHERE ve.user_id = ?
   `;
+
+  if (type === "waste" || type === "feedback") {
+    query += ` AND e.status = 'completed' AND a.status = 'present'`;
+  }
 
   db.query(query, [userId], (err, results) => {
     if (err) return res.status(500).json({ error: err });

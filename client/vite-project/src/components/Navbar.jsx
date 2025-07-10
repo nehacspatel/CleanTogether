@@ -104,7 +104,10 @@ function Navbar() {
         <li><Link to="/about">About Us</Link></li>
         <li><Link to="/events">Our Work</Link></li>
        <Link to="/leaderboard">Leaderboard</Link>
-
+      <>
+    <li><Link to="/my-certificates">My Certificates</Link></li>
+    {/* other items */}
+  </>
         {user?.role === 'volunteer' && (
           <>
             <li><Link to="/volunteer-dashboard">Dashboard</Link></li>

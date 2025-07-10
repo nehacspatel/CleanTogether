@@ -1,3 +1,4 @@
+//events.js                                                                                                                                                                          const express = require("express");
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
@@ -46,6 +47,7 @@ router.post("/", (req, res) => {
   });
 });
 
+// 3. Get completed + present events a user attended
 router.get("/registered/:userId", (req, res) => {
   const { userId } = req.params;
   const { type } = req.query;
@@ -63,7 +65,9 @@ router.get("/registered/:userId", (req, res) => {
   }
 
   db.query(query, [userId], (err, results) => {
-    if (err) return res.status(500).json({ error: err });
+    if (err) {
+      return res.status(500).json({ error: err });
+    }
     res.json(results);
   });
 });
@@ -180,7 +184,7 @@ router.put("/:eventId/status", (req, res) => {
       return res.status(403).json({ error: "You are not authorized to update this event" });
     }
 
-    const updateQuery = `UPDATE events SET status = ? WHERE event_id = ?`;
+    const updateQuery = "UPDATE events SET status = ? WHERE event_id = ?";
 
     db.query(updateQuery, [status, eventId], (updateErr, result) => {
       if (updateErr) {
@@ -199,7 +203,9 @@ router.get("/:eventId/attendance", (req, res) => {
 
   const query = `
     SELECT 
-      u.user_id, u.name, u.email, 
+      u.user_id, 
+      u.name, 
+      u.email, 
       COALESCE(a.status, 'absent') AS status
     FROM volunteer_event ve
     JOIN users u ON ve.user_id = u.user_id
@@ -228,10 +234,53 @@ router.put("/:eventId/attendance/:userId", (req, res) => {
     ON DUPLICATE KEY UPDATE status = ?
   `;
 
-  db.query(upsert, [eventId, userId, status, status], (err) => {
-    if (err) return res.status(500).json({ error: err });
-    res.json({ message: "✅ Attendance updated" });
-  });
+  const generateCertificate = require("../utils/generateCertificate"); // make sure it's imported at top
+
+db.query(upsert, [eventId, userId, status, status], async (err) => {
+  if (err) return res.status(500).json({ error: err });
+
+  if (status === "present") {
+    try {
+      // Check if certificate already exists
+      const [existing] = await db.promise().query(
+        "SELECT * FROM certificates WHERE user_id = ? AND event_id = ?",
+        [userId, eventId]
+      );
+
+      if (existing.length === 0) {
+        // Fetch names
+        const [userRows] = await db.promise().query("SELECT name FROM users WHERE user_id = ?", [userId]);
+        const [eventRows] = await db.promise().query("SELECT title FROM events WHERE event_id = ?", [eventId]);
+
+        const userName = userRows[0]?.name || "Volunteer";
+        const eventName = eventRows[0]?.title || "Event";
+
+        // Insert certificate record
+        const [insertResult] = await db.promise().query(
+          "INSERT INTO certificates (user_id, event_id) VALUES (?, ?)",
+          [userId, eventId]
+        );
+        const certId = insertResult.insertId;
+
+        // Generate the PDF
+        const fileName = await generateCertificate({ userName, eventName, certificateId: certId });
+
+        // Save URL
+        await db.promise().query(
+          "UPDATE certificates SET certificate_url = ? WHERE certificate_id = ?",
+          [fileName, certId]
+        );
+
+        console.log(`🎓 Certificate generated for user ${userId}, event ${eventId}`);
+      }
+    } catch (genErr) {
+      console.error("❌ Certificate generation failed:", genErr);
+    }
+  }
+
+  res.json({ message: "✅ Attendance updated" });
+});
+
 });
 
 module.exports = router;

@@ -28,7 +28,8 @@ import UserNotifications from "./pages/UserNotifications.jsx"; // ✅ New
 import Leaderboard from "./pages/LeaderBoard.jsx"; // ✅ New leaderboard page
 import { UserContext } from "./contexts/UserContext";
 import ErrorBoundary from "./components/ErrorBoundary";
-
+import MyCertificates from "./components/MyCertificates.jsx";
+import CertificateDownloadButton from "./components/CertificateDownloadButton.jsx";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -79,6 +80,7 @@ function App() {
               <Route path="/admin/feedback/:eventId" element={<AdminFeedbackView />} />
               <Route path="/usernotifications" element={<UserNotifications />} />
               <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/my-certificates" element={<MyCertificates />} />
 
               <Route
                 path="/profile"
